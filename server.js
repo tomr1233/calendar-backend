@@ -2,11 +2,15 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 // Enable CORS
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : ['http://localhost:3000', 'https://yourdomain.com'];
+
 app.use(cors({
-  origin: true, // Allow all origins during testing
+  origin: process.env.NODE_ENV === 'production' ? allowedOrigins : true,
   credentials: true
 }));
 
