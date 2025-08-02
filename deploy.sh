@@ -15,6 +15,12 @@ if ! command -v node &> /dev/null; then
     sudo apt-get install -y nodejs
 fi
 
+# Install nginx if not present
+if ! command -v nginx &> /dev/null; then
+    echo "📦 Installing nginx..."
+    sudo apt-get install -y nginx
+fi
+
 # Install PM2 globally
 if ! command -v pm2 &> /dev/null; then
     echo "📦 Installing PM2..."
@@ -52,3 +58,8 @@ sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -
 echo "✅ Deployment complete!"
 echo "📊 Check status with: pm2 status"
 echo "📄 View logs with: pm2 logs calendar-backend"
+echo ""
+echo "🌐 Next steps for domain setup:"
+echo "1. Point calendar-proxy.expressnext.app DNS to this server's IP"
+echo "2. Run: ./ssl-setup.sh (after DNS propagation)"
+echo "3. Your API will be available at: https://calendar-proxy.expressnext.app"

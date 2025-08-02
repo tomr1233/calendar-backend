@@ -14,6 +14,14 @@
    ./deploy.sh
    ```
 
+## Domain Setup
+
+After deployment, set up the subdomain:
+
+1. **DNS Configuration**: Point `calendar-proxy.expressnext.app` A record to your EC2 IP
+2. **SSL Setup**: Run `./ssl-setup.sh` (after DNS propagates)
+3. **Access**: Use `https://calendar-proxy.expressnext.app`
+
 ## Updates
 To update the deployment:
 ```bash
