@@ -6,12 +6,36 @@ const PORT = process.env.PORT || 3002;
 
 // Enable CORS
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
-  ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://localhost:3000', 'https://yourdomain.com'];
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : ['http://localhost:3000', 'https://expressnext.app'];
+
+console.log('🌐 Allowed CORS origins:', allowedOrigins);
+console.log('🔧 Environment:', process.env.NODE_ENV);
 
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? allowedOrigins : true,
-  credentials: true
+  origin: (origin, callback) => {
+    console.log('📨 Request from origin:', origin);
+    
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('🔓 Development mode: allowing all origins');
+      return callback(null, true);
+    }
+    
+    if (allowedOrigins.includes(origin)) {
+      console.log('✅ Origin allowed:', origin);
+      return callback(null, true);
+    }
+    
+    console.log('❌ Origin blocked:', origin);
+    console.log('📋 Allowed origins:', allowedOrigins);
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 app.use(express.json());
