@@ -46,7 +46,8 @@ app.get('/', (req, res) => {
     message: 'ExpressNext Calendar Proxy API is running!',
     endpoints: {
       health: '/api/health',
-      slots: '/api/calendar/slots'
+      slots: '/api/calendar/slots',
+      book: '/api/book/event (POST)'
     }
   });
 });
@@ -109,11 +110,49 @@ app.get('/api/calendar/slots', async (req, res) => {
   }
 });
 
+// Booking proxy endpoint
+app.post('/api/book/event', async (req, res) => {
+  try {
+    console.log('Proxying booking request...');
+
+    const response = await axios.post(
+      'https://calendar.expressnext.app/api/book/event',
+      req.body,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        },
+        timeout: 30000
+      }
+    );
+
+    res.status(response.status).json(response.data);
+
+  } catch (error) {
+    console.error('Booking proxy error:', error.message);
+
+    if (error.response) {
+      res.status(error.response.status).json(error.response.data);
+    } else if (error.request) {
+      res.status(504).json({
+        error: 'No response from calendar API',
+        message: 'The calendar service did not respond'
+      });
+    } else {
+      res.status(500).json({
+        error: 'Failed to proxy booking request',
+        message: error.message
+      });
+    }
+  }
+});
+
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ 
+  res.status(404).json({
     error: 'Endpoint not found',
-    path: req.path 
+    path: req.path
   });
 });
 
